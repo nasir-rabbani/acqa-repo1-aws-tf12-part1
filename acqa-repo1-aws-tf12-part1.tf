@@ -6,9 +6,9 @@ provider "aws" {
 resource "aws_vpc" "acqa-test-vpc1" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = format("%s-vpc1", var.acqaPrefix)
+    Name         = format("%s-vpc1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -19,9 +19,9 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
   vpc_id      = aws_vpc.acqa-test-vpc1.id
 
   tags = {
-    Name = format("%s-securitygroup1", var.acqaPrefix)
+    Name         = format("%s-securitygroup1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   # SSH access from anywhere..
@@ -52,7 +52,7 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/24"]
   }
-  
+
   # Drift 2
   ingress {
     to_port     = 3333
@@ -60,7 +60,7 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/24"]
   }
-  
+
   # outbound internet access
   egress {
     from_port   = 0
@@ -74,9 +74,9 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
 resource "aws_internet_gateway" "acqa-test-gateway1" {
   vpc_id = aws_vpc.acqa-test-vpc1.id
   tags = {
-    Name = format("%s-gateway1", var.acqaPrefix)
+    Name         = format("%s-gateway1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -86,9 +86,9 @@ resource "aws_subnet" "acqa-test-subnet1" {
   cidr_block              = "10.0.0.0/24"
   map_public_ip_on_launch = true
   tags = {
-    Name = format("%s-subnet1", var.acqaPrefix)
+    Name         = format("%s-subnet1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -103,9 +103,9 @@ resource "aws_network_interface" "acqa-test-networkinterface1" {
   #   device_index = 1
   # }
   tags = {
-    Name = format("%s-networkinterface1", var.acqaPrefix)
+    Name         = format("%s-networkinterface1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -129,9 +129,9 @@ resource "aws_s3_bucket" "acqa-test-s3bucket1" {
   }
 
   tags = {
-    Name = format("%s-s3bucket1", var.acqaPrefix)
+    Name         = format("%s-s3bucket1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -139,9 +139,9 @@ resource "aws_s3_bucket" "acqa-test-s3bucket1" {
 resource "aws_iam_role" "acqa-test-iamrole1" {
   name = "acqa-test-iamrole1"
   tags = {
-    Name = format("%s-iamrole1", var.acqaPrefix)
+    Name         = format("%s-iamrole1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   assume_role_policy = <<EOF
@@ -164,9 +164,9 @@ EOF
 # Create lambda function
 resource "aws_lambda_function" "acqa-test-lambda1" {
   tags = {
-    Name = format("%s-lamda1", var.acqaPrefix)
+    Name         = format("%s-lamda1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   filename      = "acqa-test-lambda1.zip"
@@ -239,9 +239,9 @@ module "acqa-test-cbmodule1" {
 
   # Tags
   tags = {
-    Name = format("%s-module1", var.acqaPrefix)
+    Name         = format("%s-module1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
 }
@@ -292,9 +292,9 @@ resource "aws_cloudwatch_log_group" "acqa-test-cwlg1" {
 
   # Tags
   tags = {
-    Name = format("%s-cwlg1", var.acqaPrefix)
+    Name         = format("%s-cwlg1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 resource "aws_cloudwatch_log_stream" "acqa-test-cwstream1" {
@@ -325,9 +325,9 @@ resource "aws_kms_key" "acqa-test-kmskey1" {
   description             = "acqa-test-kmskey1"
   deletion_window_in_days = 30
   tags = {
-    Name = format("%s-kmskey1", var.acqaPrefix)
+    Name         = format("%s-kmskey1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -337,9 +337,9 @@ resource "aws_ebs_volume" "acqa-test-ebsvolume1" {
   size              = 25
   encrypted         = false
   tags = {
-    Name = format("%s-ebsvolume1", var.acqaPrefix)
+    Name         = format("%s-ebsvolume1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -349,9 +349,9 @@ resource "aws_eip" "acqa-test-eip1" {
   network_interface         = aws_network_interface.acqa-test-networkinterface1.id
   associate_with_private_ip = "10.0.0.50"
   tags = {
-    Name = format("%s-eip1", var.acqaPrefix)
+    Name         = format("%s-eip1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -360,15 +360,15 @@ resource "aws_instance" "acqa-test-instance1" {
   ami           = data.aws_ami.acqa-test-instance1-ami.id
   instance_type = "t2.micro"
 
-   network_interface {
+  network_interface {
     network_interface_id = aws_network_interface.acqa-test-networkinterface1.id
     device_index         = 0
-  } 
+  }
 
   tags = {
-    Name = format("%s-instance1", var.acqaPrefix)
+    Name         = format("%s-instance1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -391,20 +391,20 @@ resource "aws_subnet" "acqa-test-albsubnet1" {
   cidr_block              = "10.0.44.0/24"
   map_public_ip_on_launch = true
   tags = {
-    Name = format("%s-albsubnet1", var.acqaPrefix)
+    Name         = format("%s-albsubnet1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 resource "aws_subnet" "acqa-test-albsubnet2" {
   vpc_id                  = aws_vpc.acqa-test-vpc1.id
   cidr_block              = "10.0.38.0/24"
   map_public_ip_on_launch = true
-  availability_zone = "ca-central-1d"
+  availability_zone       = "ca-central-1d"
   tags = {
-    Name = format("%s-albsubnet2", var.acqaPrefix)
+    Name         = format("%s-albsubnet2", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -419,9 +419,9 @@ resource "aws_lb" "acqa-test-alb1" {
   enable_deletion_protection = false
 
   tags = {
-    Name = format("%s-alb1", var.acqaPrefix)
+    Name         = format("%s-alb1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -431,17 +431,22 @@ resource "aws_placement_group" "acqa-test-placementgroup1" {
   strategy = "partition"
 
   tags = {
-    Name = format("%s-placementgroup1", var.acqaPrefix)
+    Name         = format("%s-placementgroup1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
 resource "aws_launch_configuration" "acqa-test-launchconfig1" {
-  name          = "acqa-test-launchconfig1"
+  name = "acqa-test-launchconfig1"
   # image_id      = data.aws_ami.acqa-test-instance1-ami.id
   image_id      = "ami-0ad340a3355388c70"
   instance_type = "t2.micro"
+
+  metadata_options {
+    http_endpoint = "disabled"
+    http_tokens   = "required"
+  }
 }
 
 resource "aws_autoscaling_group" "acqa-test-asg1" {
@@ -458,10 +463,10 @@ resource "aws_autoscaling_group" "acqa-test-asg1" {
   vpc_zone_identifier       = [aws_subnet.acqa-test-albsubnet1.id, aws_subnet.acqa-test-albsubnet2.id]
 
   initial_lifecycle_hook {
-    name                 = "aqa-test-asg1-lifecyclehook1"
-    default_result       = "CONTINUE"
-    heartbeat_timeout    = 2000
-    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+    name                  = "aqa-test-asg1-lifecyclehook1"
+    default_result        = "CONTINUE"
+    heartbeat_timeout     = 2000
+    lifecycle_transition  = "autoscaling:EC2_INSTANCE_LAUNCHING"
     notification_metadata = <<EOF
 {
   "foo": "bar"
@@ -501,12 +506,12 @@ resource "aws_dynamodb_table" "acqa-test-dynamodbtable1" {
     type = "S"
   }
   server_side_encryption {
-    enabled     = false
+    enabled = false
   }
   tags = {
-    Name = format("%s-dynamodbtable1", var.acqaPrefix)
+    Name         = format("%s-dynamodbtable1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -606,9 +611,9 @@ resource "aws_cloudfront_distribution" "acqa-test-cloudfront1" {
   }
 
   tags = {
-    Name = format("%s-cloudfront1", var.acqaPrefix)
+    Name         = format("%s-cloudfront1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   viewer_certificate {
@@ -624,9 +629,9 @@ resource "aws_codecommit_repository" "acqa-test-ccrepo1" {
   repository_name = "acqa-test-ccrepo1"
   description     = "acqa-test-ccrepo1"
   tags = {
-    Name = format("%s-cloudfront1", var.acqaPrefix)
+    Name         = format("%s-cloudfront1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -643,7 +648,7 @@ resource "aws_elastic_beanstalk_application" "acqa-test-elasticbeanstalkapp1" {
   tags = {
     # Name = format("%s-elasticbeanstalkapp1", var.acqaPrefix) - This is reserved
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -656,9 +661,9 @@ resource "aws_ecr_repository" "acqa-test-ecr1" {
     scan_on_push = false
   }
   tags = {
-    Name = format("%s-ecr1", var.acqaPrefix)
+    Name         = format("%s-ecr1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -666,10 +671,10 @@ resource "aws_ecr_repository" "acqa-test-ecr1" {
 resource "aws_ecs_cluster" "acqa-test-ecs1" {
   name = "acqa-test-ecs1"
   tags = {
-    Name = format("%s-ecs1", var.acqaPrefix)
+    Name         = format("%s-ecs1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
-  } 
+    Owner        = "ACQA"
+  }
 }
 
 # EKS
@@ -701,9 +706,9 @@ resource "aws_elasticache_cluster" "acqa-test-elasticcachecluster1" {
   parameter_group_name = "default.memcached1.5"
   port                 = 11211
   tags = {
-    Name = format("%s-elasticcachecluster1", var.acqaPrefix)
+    Name         = format("%s-elasticcachecluster1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -778,7 +783,7 @@ resource "aws_accessanalyzer_analyzer" "acqa-test-iamaccessanalyzer1" {
 
   tags = {
     ACQAResource = "true"
-    Name = format("%s-iamaccessanalyzer1", var.acqaPrefix)
+    Name         = format("%s-iamaccessanalyzer1", var.acqaPrefix)
   }
 
   type = "ACCOUNT"
@@ -823,7 +828,7 @@ resource "aws_kinesis_firehose_delivery_stream" "acqa-test-kinesisfirehoseds1" {
   name = "acqa-test-kinesisfirehoseds1"
 
   server_side_encryption {
-    enabled  = "false"
+    enabled = "false"
     # key_type = "AWS_OWNED_CMK"
   }
 
@@ -898,7 +903,7 @@ resource "aws_flow_log" "acqa-test-vpc1-flowlog1" {
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.acqa-test-vpc1.id
 
-    tags = {
+  tags = {
     ACQAResource = "true"
     Name         = format("%s-vpc1-flowlog1", var.acqaPrefix)
     Owner        = "AC-QA"
@@ -917,10 +922,10 @@ resource "aws_cloudwatch_log_group" "acqa-test-cwlg2" {
 resource "aws_iam_role" "acqa-test-flowlog-role1" {
   name = "acqa-test-flowlog-role1"
   tags = {
-      ACQAResource = "true"
-      Name         = format("%s-flowlog-role1", var.acqaPrefix)
-      Owner        = "AC-QA"
-    }
+    ACQAResource = "true"
+    Name         = format("%s-flowlog-role1", var.acqaPrefix)
+    Owner        = "AC-QA"
+  }
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
