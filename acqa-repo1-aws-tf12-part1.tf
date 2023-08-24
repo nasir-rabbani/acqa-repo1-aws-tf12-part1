@@ -1,18 +1,18 @@
 provider "aws" {
   region = "ca-central-1" //Canada
-#  skip_credentials_validation = true
-#  skip_requesting_account_id  = true
-#  access_key                  = "mock_access_key"
-#  secret_key                  = "mock_secret_key"
+  #  skip_credentials_validation = true
+  #  skip_requesting_account_id  = true
+  #  access_key                  = "mock_access_key"
+  #  secret_key                  = "mock_secret_key"
 }
 
 # Create a VPC to launch our instances into
 resource "aws_vpc" "acqa-test-vpc1" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = format("%s-vpc1", var.acqaPrefix)
+    Name         = format("%s-vpc1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -23,9 +23,9 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
   vpc_id      = aws_vpc.acqa-test-vpc1.id
 
   tags = {
-    Name = format("%s-securitygroup1", var.acqaPrefix)
+    Name         = format("%s-securitygroup1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   # SSH access from anywhere..
@@ -33,7 +33,7 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/24"]
+    cidr_blocks = ["<cidr>"]
   }
   ingress {
     from_port   = 9020
@@ -54,9 +54,9 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
     to_port     = 3306
     from_port   = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/24"]
+    cidr_blocks = ["<cidr>"]
   }
-  
+
   # Drift 2
   ingress {
     to_port     = 3333
@@ -64,7 +64,7 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/24"]
   }
-  
+
   # outbound internet access
   egress {
     from_port   = 0
@@ -78,9 +78,9 @@ resource "aws_security_group" "acqa-test-securitygroup1" {
 resource "aws_internet_gateway" "acqa-test-gateway1" {
   vpc_id = aws_vpc.acqa-test-vpc1.id
   tags = {
-    Name = format("%s-gateway1", var.acqaPrefix)
+    Name         = format("%s-gateway1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -88,12 +88,12 @@ resource "aws_internet_gateway" "acqa-test-gateway1" {
 resource "aws_subnet" "acqa-test-subnet1" {
   vpc_id                  = aws_vpc.acqa-test-vpc1.id
   cidr_block              = "10.0.0.0/24"
-  availability_zone = "ca-central-1a"
-  map_public_ip_on_launch = true
+  availability_zone       = "ca-central-1a"
+  map_public_ip_on_launch = false
   tags = {
-    Name = format("%s-subnet1", var.acqaPrefix)
+    Name         = format("%s-subnet1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -108,9 +108,9 @@ resource "aws_network_interface" "acqa-test-networkinterface1" {
   #   device_index = 1
   # }
   tags = {
-    Name = format("%s-networkinterface1", var.acqaPrefix)
+    Name         = format("%s-networkinterface1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -121,9 +121,9 @@ resource "aws_network_interface" "acqa-test-networkinterface1" {
 resource "aws_s3_bucket" "acqa-test-s3bucket1" {
   bucket = "acqa-test-s3bucket1"
   tags = {
-    Name = format("%s-s3bucket1", var.acqaPrefix)
+    Name         = format("%s-s3bucket1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -143,9 +143,9 @@ resource "aws_s3_bucket_acl" "acqa-test-s3bucketAcl-test-webhook2" {
 resource "aws_iam_role" "acqa-test-iamrole1" {
   name = "acqa-test-iamrole1"
   tags = {
-    Name = format("%s-iamrole1", var.acqaPrefix)
+    Name         = format("%s-iamrole1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   assume_role_policy = <<EOF
@@ -168,9 +168,9 @@ EOF
 # Create lambda function
 resource "aws_lambda_function" "acqa-test-lambda1" {
   tags = {
-    Name = format("%s-lamda1", var.acqaPrefix)
+    Name         = format("%s-lamda1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 
   filename      = "acqa-test-lambda1.zip"
@@ -190,6 +190,20 @@ resource "aws_lambda_function" "acqa-test-lambda1" {
       foo = "bar"
     }
   }
+
+  vpc_config {
+    security_group_ids = ["<valid_security_group_ids>"]
+    subnet_ids         = ["<valid_subnet_ids>"]
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+
+  dead_letter_config {
+    target_arn = "<target_arn>"
+  }
+  code_signing_config_arn = "<valid_code_signing_config_arn>"
 }
 
 # # START ------------------- CODE BUILD PROJECT -------------------
@@ -296,10 +310,12 @@ resource "aws_cloudwatch_log_group" "acqa-test-cwlg2" {
 
   # Tags
   tags = {
-    Name = format("%s-cwlg1", var.acqaPrefix)
+    Name         = format("%s-cwlg1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
+
+  kms_key_id = "<kms_key_id>"
 }
 resource "aws_cloudwatch_log_stream" "acqa-test-cwstream1" {
   name           = "acqa-test-cwstream1"
@@ -329,9 +345,9 @@ resource "aws_kms_key" "acqa-test-kmskey1" {
   description             = "acqa-test-kmskey1"
   deletion_window_in_days = 30
   tags = {
-    Name = format("%s-kmskey1", var.acqaPrefix)
+    Name         = format("%s-kmskey1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -339,11 +355,11 @@ resource "aws_kms_key" "acqa-test-kmskey1" {
 resource "aws_ebs_volume" "acqa-test-ebsvolume1" {
   availability_zone = "ca-central-1a"
   size              = 25
-  encrypted         = false
+  encrypted         = true
   tags = {
-    Name = format("%s-ebsvolume1", var.acqaPrefix)
+    Name         = format("%s-ebsvolume1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -353,9 +369,9 @@ resource "aws_eip" "acqa-test-eip1" {
   network_interface         = aws_network_interface.acqa-test-networkinterface1.id
   associate_with_private_ip = "10.0.0.50"
   tags = {
-    Name = format("%s-eip1", var.acqaPrefix)
+    Name         = format("%s-eip1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
 }
 
@@ -364,14 +380,82 @@ resource "aws_instance" "acqa-test-instance1" {
   ami           = data.aws_ami.acqa-test-instance1-ami.id
   instance_type = "t2.medium"
 
-   network_interface {
+  network_interface {
     network_interface_id = aws_network_interface.acqa-test-networkinterface1.id
     device_index         = 0
-  } 
+  }
 
   tags = {
-    Name = format("%s-instance1", var.acqaPrefix)
+    Name         = format("%s-instance1", var.acqaPrefix)
     ACQAResource = "true"
-    Owner = "ACQA"
+    Owner        = "ACQA"
   }
+  vpc_security_group_ids = ["<security_group_id>"]
+  monitoring             = true
+
+  metadata_options {
+    http_endpoint = "disabled"
+    http_tokens   = "required"
+  }
+}
+resource "aws_ebs_snapshot" "acqa-test-ebsvolume1-snapshot" {
+  volume_id = aws_ebs_volume.acqa-test-ebsvolume1.id
+}
+resource "aws_lambda_provisioned_concurrency_config" "acqa-test-lambda1-provisioned" {
+  function_name                     = aws_lambda_alias.acqa-test-lambda1.function_name
+  provisioned_concurrent_executions = 1
+  qualifier                         = "<valid_qualifier>"
+}
+resource "aws_flow_log" "acqa-test-vpc1" {
+  vpc_id          = "${aws_vpc.acqa-test-vpc1.id}"
+  iam_role_arn    = "<iam_role_arn>"
+  log_destination = "${aws_s3_bucket.acqa-test-vpc1.arn}"
+  traffic_type    = "ALL"
+
+  tags = {
+    GeneratedBy      = "Accurics"
+    ParentResourceId = "aws_vpc.acqa-test-vpc1"
+  }
+}
+resource "aws_s3_bucket" "acqa-test-vpc1" {
+  bucket        = "acqa-test-vpc1_flow_log_s3_bucket"
+  acl           = "private"
+  force_destroy = true
+
+  versioning {
+    enabled    = true
+    mfa_delete = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+}
+resource "aws_s3_bucket_policy" "acqa-test-vpc1" {
+  bucket = "${aws_s3_bucket.acqa-test-vpc1.id}"
+
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "acqa-test-vpc1-restrict-access-to-users-or-roles",
+      "Effect": "Allow",
+      "Principal": [
+        {
+          "AWS": [
+            <principal_arn>
+          ]
+        }
+      ],
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::${aws_s3_bucket.acqa-test-vpc1.id}/*"
+    }
+  ]
+}
+POLICY
 }
